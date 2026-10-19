@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Queue Management System</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        header {
+            background: #0f172a;
+            color: white;
+            padding: 25px 15px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #cbd5e1;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 30px auto;
+            padding: 15px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 12px #00000010;
+        }
+
+        .card h3 {
+            color: #64748b;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .card h2 {
+            color: #2563eb;
+            font-size: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px #00000010;
+        }
+
+        .panel h2 {
+            margin-bottom: 20px;
+            color: #0f172a;
+        }
+
+        label {
+            display: block;
+            margin: 12px 0 7px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .cancel {
+            background: #dc2626;
+            margin-left: 5px;
+        }
+
+        .cancel:hover {
+            background: #b91c1c;
+        }
+
+        .message {
+            margin-top: 18px;
+            padding: 15px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.8;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #eff6ff;
+        }
+
+        .status {
+            padding: 5px 9px;
+            border-radius: 15px;
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 13px;
+        }
+
+        .call-btn {
+            background: #16a34a;
+            margin: 0;
+        }
+
+        .call-btn:hover {
+            background: #15803d;
+        }
+
+        .empty {
+            color: #64748b;
+            padding: 20px 0;
+        }
+
+        footer {
+            background: #0f172a;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Smart Queue Management System</h1>
+    <p>Register Online | Get Your Token | Save Your Time</p>
+</header>
+
+<div class="container">
+
+    <div class="cards">
+        <div class="card">
+            <h3>Total Customers Waiting</h3>
+            <h2 id="totalWaiting">0</h2>
+        </div>
+
+        <div class="card">
+            <h3>Now Serving</h3>
+            <h2 id="nowServing">None</h2>
+        </div>
+
+        <div class="card">
+            <h3>Estimated Wait</h3>
+            <h2 id="estimatedWait">0 min</h2>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Customer Registration</h2>
+
+        <form id="registrationForm">
+
+            <label for="customerName">Full Name</label>
+            <input
+                type="text"
+                id="customerName"
+                placeholder="Enter your full name"
+                maxlength="80"
+                required
+            >
+
+            <label for="phone">Phone Number</label>
+            <input
+                type="tel"
+                id="phone"
+                placeholder="Enter your phone number"
+                pattern="[0-9]{10}"
+                maxlength="10"
+                inputmode="numeric"
+                required
+            >
+
+            <label for="service">Select Service</label>
+            <select id="service" required>
+                <option value="">-- Select a service --</option>
+                <option value="General Enquiry">General Enquiry</option>
+                <option value="Customer Support">Customer Support</option>
+                <option value="Billing">Billing</option>
+                <option value="Appointment">Appointment</option>
+            </select>
+
+            <button type="submit">Get Queue Token</button>
+
+        </form>
+
+        <div class="message" id="successMessage"></div>
+    </div>
+
+    <div class="panel">
+        <h2>Live Queue Status</h2>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Estimated Wait</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="queueTable"></tbody>
+            </table>
+        </div>
+
+        <p id="emptyMessage" class="empty">
+            No customers registered yet. Register to receive a token.
+        </p>
+    </div>
+
+    <div class="panel">
+        <h2>Queue Management</h2>
+
+        <p>
+            Use this demo control to call the next waiting customer.
+            In a real deployment, access to queue controls should be
+            restricted to authorized staff.
+        </p>
+
+        <button onclick="callNextCustomer()">
+            Call Next Customer
+        </button>
+
+        <button class="cancel" onclick="resetDemo()">
+            Reset Demo
+        </button>
+
+        <p id="adminMessage" style="margin-top:15px;"></p>
+    </div>
+
+</div>
+
+<footer>
+    <p>Smart Queue Management System | Smart Service, Less Waiting</p>
+</footer>
+
+<script>
+    const STORAGE_KEY = "smartQueueDemo_v1";
+
+    let queue = [];
+    let nextToken = 1;
+    let currentServing = null;
+
+    // Load saved demo data from this browser.
+    function loadQueue() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+
+            if (saved) {
+                const data = JSON.parse(saved);
+
+                if (
+                    Array.isArray(data.queue) &&
+                    Number.isInteger(data.nextToken) &&
+                    data.nextToken > 0
+                ) {
+                    queue = data.queue;
+                    nextToken = data.nextToken;
+                    currentServing = data.currentServing || null;
+                }
+            }
+        } catch (error) {
+            console.error("Could not load saved queue.", error);
+        }
+
+        renderQueue();
+    }
+
+    function saveQueue() {
+        localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+                queue: queue,
+                nextToken: nextToken,
+                currentServing: currentServing
+            })
+        );
+    }
+
+    // Calculate approximate waiting time.
+    function getWaitingTime(index) {
+        return index * 5;
+    }
+
+    // Register a new customer.
+    document.getElementById("registrationForm")
+        .addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            const name = document.getElementById("customerName")
+                .value.trim();
+
+            const phone = document.getElementById("phone")
+                .value.trim();
+
+            const service = document.getElementById("service")
+                .value;
+
+            if (!name || !/^[0-9]{10}$/.test(phone) || !service) {
+                alert("Please enter valid registration details.");
+                return;
+            }
+
+            const token = "Q" + String(nextToken).padStart(3, "0");
+
+            const customer = {
+                token: token,
+                name: name,
+                phone: phone,
+                service: service,
+                status: "Waiting",
+                createdAt: new Date().toISOString()
+            };
+
+            queue.push(customer);
+            nextToken++;
+
+            saveQueue();
+            renderQueue();
+
+            const waitingPosition = queue.filter(
+                item => item.status === "Waiting"
+            ).length;
+
+            const wait = Math.max(0, waitingPosition - 1) * 5;
+
+            const message = document.getElementById("successMessage");
+
+            message.innerHTML = `
+                <strong>Registration Successful!</strong><br>
+                Your token number is: <strong>${token}</strong><br>
+                Customer: ${escapeHTML(name)}<br>
+                Service: ${escapeHTML(service)}<br>
+                Estimated waiting time: ${wait} minutes
+            `;
+
+            message.style.display = "block";
+
+            this.reset();
+        });
+
+    // Escape text before displaying it as HTML.
+    function escapeHTML(value) {
+        return String(value).replace(/[&<>"']/g, function(character) {
+            return {
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            }[character];
+        });
+    }
+
+    // Update the dashboard and queue table.
+    function renderQueue() {
+        const table = document.getElementById("queueTable");
+        table.innerHTML = "";
+
+        const waitingCustomers = queue.filter(
+            customer => customer.status === "Waiting"
+        );
+
+        document.getElementById("totalWaiting").textContent =
+            waitingCustomers.length;
+
+        document.getElementById("nowServing").textContent =
+            currentServing || "None";
+
+        document.getElementById("estimatedWait").textContent =
+            (waitingCustomers.length * 5) + " min";
+
+        document.getElementById("emptyMessage").style.display =
+            queue.length === 0 ? "block" : "none";
+
+        queue.forEach(customer => {
+            let wait = "—";
+
+            if (customer.status === "Waiting") {
+                const position = waitingCustomers.indexOf(customer);
+                wait = getWaitingTime(position) + " min";
+            }
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>${escapeHTML(customer.token)}</td>
+                <td>${escapeHTML(customer.name)}</td>
+                <td>${escapeHTML(customer.service)}</td>
+                <td>${wait}</td>
+                <td><span class="status">
+                    ${escapeHTML(customer.status)}
+                </span></td>
+                <td></td>
+            `;
+
+            if (customer.status === "Waiting") {
+                const button = document.createElement("button");
+                button.textContent = "Remove";
+                button.className = "cancel";
+
+                button.addEventListener("click", function() {
+                    removeCustomer(customer.token);
+                });
+
+                row.cells[5].appendChild(button);
+            }
+
+            table.appendChild(row);
+        });
+    }
+
+    // Call the next waiting customer.
+    function callNextCustomer() {
+        const nextCustomer = queue.find(
+            customer => customer.status === "Waiting"
+        );
+
+        const message = document.getElementById("adminMessage");
+
+        if (!nextCustomer) {
+            message.textContent = "There are no waiting customers.";
+            return;
+        }
+
+        nextCustomer.status = "Serving";
+        currentServing = nextCustomer.token;
+
+        message.textContent =
+            "Now serving " + nextCustomer.token +
+            " — " + nextCustomer.name;
+
+        saveQueue();
+        renderQueue();
+    }
+
+    // Remove a customer from the waiting queue.
+    function removeCustomer(token) {
+        const customer = queue.find(item => item.token === token);
+
+        if (!customer || customer.status !== "Waiting") {
+            return;
+        }
+
+        queue = queue.filter(item => item.token !== token);
+
+        saveQueue();
+        renderQueue();
+    }
+
+    // Reset the local demonstration data.
+    function resetDemo() {
+        const confirmed = confirm(
+            "Delete all queue data saved in this browser?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        queue = [];
+        nextToken = 1;
+        currentServing = null;
+
+        localStorage.removeItem(STORAGE_KEY);
+
+        document.getElementById("successMessage").style.display = "none";
+        document.getElementById("adminMessage").textContent = "";
+
+        renderQueue();
+    }
+
+    loadQueue();
+</script>
+
+</body>
+</html>
