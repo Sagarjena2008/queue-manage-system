@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SmartQueue Management System</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+    <h2>SmartQueue</h2>
+
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="#register">Register</a>
+        <a href="#status">Queue Status</a>
+        <a href="admin.php">Admin</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h1>Welcome to SmartQueue</h1>
+
+    <p>
+        Join the queue online.
+        Save time and avoid unnecessary waiting.
+    </p>
+
+    <a class="button" href="#register">
+        Get Your Token
+    </a>
+</section>
+
+<section class="card" id="register">
+
+    <h2>Customer Registration</h2>
+
+    <form action="register.php" method="POST">
+
+        <label for="name">Full Name</label>
+
+        <input
+            type="text"
+            id="name"
+            name="name"
+            maxlength="100"
+            required
+        >
+
+        <label for="phone">Mobile Number</label>
+
+        <input
+            type="tel"
+            id="phone"
+            name="phone"
+            placeholder="+918454947468"
+            pattern="[+]?[0-9]{10,15}"
+            required
+        >
+
+        <button type="submit">
+            Register and Get Token
+        </button>
+
+    </form>
+
+    <p class="note">
+        Enter your own mobile number to receive notifications.
+    </p>
+
+</section>
+
+<section class="card" id="status">
+
+    <h2>Check Queue Status</h2>
+
+    <p>Already registered? Enter your token number.</p>
+
+    <form action="queue_status.php" method="GET">
+
+        <label for="token">Token Number</label>
+
+        <input
+            type="text"
+            id="token"
+            name="token"
+            placeholder="A101"
+            maxlength="20"
+            required
+        >
+
+        <button type="submit">
+            Check Status
+        </button>
+
+    </form>
+
+</section>
+
+<footer>
+    <p>SmartQueue Management System</p>
+    <p>Making queues smarter and faster.</p>
+</footer>
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("SmartQueue website loaded successfully.");
+});
+
+</body>
+</html>
